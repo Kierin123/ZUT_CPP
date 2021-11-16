@@ -111,7 +111,6 @@ int main(void)
      buff.push(7);
      buff.get();
      buff.get();
-
      buff.push(8);
      buff.push(9);
      buff.push(10);
