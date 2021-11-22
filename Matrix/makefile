@@ -1,7 +1,7 @@
 CFLAGS = -Wall -Wextra -Wpedantic
 CC = g++
 LDFLAGS = 
-SOURCES = main.cpp
+SOURCES = main.cpp 
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = program
 

@@ -7,7 +7,11 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-template <int N = 1, int M = 1, typename T = int>
+//   N - number of raws
+//   M - number of column
+//   T - type of data
+
+template <int N, int M, typename T>
 class Matrix
 {
      vector<vector<T>> Mat;
@@ -19,48 +23,32 @@ public:
      Matrix()
      {
           Mat.resize(N);
-          vector<T> temp_vect(M, 0);
           for (auto i = Mat.begin(); i < Mat.end(); i++)
           {
-               *i = temp_vect;
+               *i = vector<T>(0);
           }
      };
 
      Matrix(int val)
      {
           Mat.resize(N);
-          vector<T> temp_vect(M, val);
           for (auto i = Mat.begin(); i < Mat.end(); i++)
           {
-               *i = temp_vect;
+               *i = vector<T>(M, val);
           }
      };
 
      Matrix(const Matrix<N, M, T> &cpMat)
      {
           Mat.resize(N);
-
-          cout << "    Copy Ctor\n";
           for (auto i = 0; i < N; i++)
           {
-               Mat[i] = cpMat[i];
-          }
-     }
-
-     template <int N1, int M1, typename T1>
-     Matrix(const Matrix<N1, M1, T1> &cpMat)
-     {
-          Mat.resize(N1);
-
-          cout << "    Copy Ctor T1!!!\n";
-          for (auto i = 0; i < N1; i++)
-          {
-               Mat[i] = cpMat[i];
+               Mat[i] = cpMat.Mat[i];
           }
      }
 
      //################################
-     //        methods
+     //        Methods
      //################################
 
      void fillBy(T val)
@@ -79,10 +67,16 @@ public:
      template <int N1, int M1, typename T1>
      Matrix<N, M, T> &operator=(const Matrix<N1, M1, T1> &input)
      {
-          for (auto i = 0; i < N; i++)
+          if ((N1 == N) && (M1 == M))
           {
-               Mat[i] = input[i];
+               for (auto i = 0; i < N1; i++)
+               {
+                    Mat[i] = input[i];
+               }
           }
+          else
+               printf("Cannot assign, wrong size\n");
+
           return *this;
      }
 
@@ -92,33 +86,21 @@ public:
           {
                Mat[i] = input[i];
           }
+
           return *this;
      }
 
-     template <int N1, int M1, typename T1>
-     Matrix<N, M, T> &operator+(const Matrix<N1, M1, T1> &input)
+     Matrix<N, M, T> &operator=(const Matrix<N, M, T> &&input)
      {
-
-          if ((N1 >= N) && (M1 >= M))
+          for (auto i = 0; i < N; i++)
           {
-
-               for (int i = 0; i < N1; i++)
-               {
-                    for (int j = 0; j < M1; j++)
-                    {
-                         Mat[i][j] = Mat[i][j] + input[i][j];
-                    }
-               }
+               Mat[i] = input[i];
           }
-          else
-               printf("Cannot add, wrong size\n");
-
           return *this;
      }
 
      Matrix<N, M, T> &operator+(const Matrix<N, M, T> &input)
      {
-
           for (int i = 0; i < N; i++)
           {
                for (int j = 0; j < M; j++)
@@ -132,12 +114,52 @@ public:
 
      Matrix<N, M, T> &operator+(int val)
      {
+          if (N == M)
+          {
+               for (int i = 0; i < N; i++)
+               {
+
+                    Mat[i][i] = Mat[i][i] + val;
+               }
+          }
+          else
+          {
+               cout << "Cannot be done! Different raw and column size." << endl;
+          }
+
+          return *this;
+     }
+
+     template <typename T1>
+     Matrix<M, N, T> operator*(const Matrix<N, M, T1> &input)
+     {
+          Matrix<M, N, T> temp_mat(0);
+          auto it = temp_mat.Mat.begin();
+          for (int k = 0; k < M; k++)
+          {
+               vector<T> temp_vect(N);
+               for (int i = 0; i < N; i++)
+               {
+                    for (int j = 0; j < M; j++)
+                    {
+                         temp_vect[i] += Mat[k][j] * input[j][k];
+                    }
+               }
+               *it = temp_vect;
+               it++;
+          }
+
+          return temp_mat;
+     }
+
+     Matrix<N, M, T> &operator*(int val)
+     {
 
           for (int i = 0; i < N; i++)
           {
                for (int j = 0; j < M; j++)
                {
-                    Mat[i][j] = Mat[i][j] + val;
+                    Mat[i][j] = Mat[i][j] * val;
                }
           }
 
@@ -146,7 +168,7 @@ public:
 
      vector<T> operator[](int index) const
      {
-          return (Mat.at(index));
+          return (Mat[index]);
      }
 };
 
@@ -194,12 +216,10 @@ std::ostream &operator<<(std::ostream &os, Matrix<N, M, T> &input)
 
 int main(void)
 {
-     Matrix<3, 5, int> M1;
-     Matrix<3, 2, int> M2;
-     M2.fillBy(3);
-
-     Matrix<3, 5, int> M3 = M2;
-     Matrix<3, 5, int> M4(10);
+     Matrix<3, 3, int> M1(3);
+     M1 = M1 + 2;
+     Matrix<3, 3, int> M2(2);
+     Matrix<3, 3, int> M3(0);
 
      cout << "new M1: " << endl
           << M1;
@@ -207,20 +227,22 @@ int main(void)
           << M2;
      cout << "new M3: " << endl
           << M3;
-     cout << "new M4: " << endl
-          << M4;
 
+     try
+     {
+          M3 = M1 * M2;
+     }
+     catch (const std::exception &e)
+     {
+          std::cerr << e.what() << '\n';
+     }
 
-     M2 = M2 + 2;
-
-     cout << "M2: " << endl
+     cout << "new M1: " << endl
+          << M1;
+     cout << "new M2: " << endl
           << M2;
-     M1 = M2 + M3;
-     cout << "M1: \n"
-          << M1;
-     M1 = M2 + 9;
-     cout << "M1: \n"
-          << M1;
+     cout << "new M3: " << endl
+          << M3;
 
      return 0;
 }

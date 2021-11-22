@@ -16,8 +16,10 @@ class RingBuffer
 public:
      RingBuffer()
      {
+
           headIt = bufferPtr.begin();
           tailIt = bufferPtr.begin();
+
           bufferElements = 0;
      };
 
@@ -71,6 +73,28 @@ public:
           return output;
      }
 
+     T show()
+     {
+          T output = 0;
+
+          if ((tailIt == headIt) && (bufferElements == 0))
+          {
+               printf("Error! buffer empty.\n");
+          }
+          else if (tailIt == (bufferPtr.end() - 1))
+          {
+               output = *tailIt;
+               tailIt = bufferPtr.begin();
+          }
+          else
+          {
+               output = *tailIt;
+               tailIt++;
+          }
+
+          return output;
+     }
+
      int size()
      {
           return bufferElements;
@@ -84,15 +108,21 @@ public:
      {
           return bufferPtr.at(index);
      }
+
+     const T *getHeadIt()
+     {
+          return headIt;
+     }
 };
 
 template <typename T, int N>
 std::ostream &operator<<(std::ostream &os, RingBuffer<T, N> &var)
 {
+
      int bufferSize = var.size();
      for (int i = 0; i < bufferSize; i++)
      {
-          os << var.get() << " ";
+          os << var.show() << " ";
      }
 
      return os;
@@ -124,6 +154,9 @@ int main(void)
      std::cout << "RingBuffer elements: " << buff << std::endl;
      std::cout << "RingBuffer size: " << buff.size() << std::endl;
      std::cout << "RingBuffer elements: " << buff << std::endl;
+
+     std::cout << "Buffer elem: " << buff.get() << std::endl;
+     std::cout << "RingBuffer size: " << buff.size() << std::endl;
 
      return 0;
 }
