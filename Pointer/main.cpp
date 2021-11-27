@@ -2,91 +2,354 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <list>
+#include <memory>
+#include <exception>
+#include "MyPtr.h"
+#include "MyPtr_ref.h"
 
-template <typename T>
-class MyPtr
-{
-     T *ptr;
+// template <typename T>
+// class MyPtr
+// {
+//      T *ptr;
 
-public:
-     MyPtr()
-     {
-          ptr = new T;
-     };
+// public:
+//      MyPtr() noexcept
+//      {
+//           ptr = new T;
+//      };
 
-     MyPtr(T input)
-     {
-          ptr = new T;
-          *ptr = input;
-     };
+//      MyPtr(T input)
+//      {
+//           ptr = new T;
+//           *ptr = input;
+//      };
 
-     ~MyPtr()
-     {
-          delete ptr;
-     }
+//      ~MyPtr()
+//      {
+//           delete ptr;
+//      }
 
-     MyPtr(const MyPtr &oldPtr)
-     {
-          ptr = new T;
-          *ptr = oldPtr.get();
-     }
+//      MyPtr(const MyPtr &) = delete; // No copy constructor! Unique_ptr.
 
-     MyPtr(MyPtr &&inPtr)
-     {
-          ptr = inPtr.ptr;
-          inPtr.ptr = nullptr;
-     }
+//      MyPtr &operator=(const MyPtr &x) = delete; // No copy assignment! Unique Ptr
 
-     MyPtr &operator=(const MyPtr &x)
-     {
-          if (&x != this)
-          {
-               delete ptr; 
-               ptr = new T(x.get());
-          }
-          return *this;
-     }
+//      MyPtr &operator=(MyPtr &&x)
+//      {
+//           if (&x != this)
+//           {
+//                delete ptr;
+//                ptr = x.ptr;
+//                x.ptr = nullptr;
+//           }
+//           return *this;
+//      }
 
-     void operator=(T input)
-     {
-          *ptr = input;
-     }
+//      void operator=(T input)
+//      {
+//           *ptr = input;
+//      }
 
-     T &get() const
-     {
-          return *ptr;
-     }
+//      T operator*()
+//      {
+//           return *ptr;
+//      }
 
-     T *getAdress()
-     {
-          return ptr;
-     }
-};
+//      bool operator==(MyPtr<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr == *input.ptr)
+//           {
+//                out = true;
+//           }
 
-template <typename T1>
-void swap(MyPtr<T1> &x1, MyPtr<T1> &x2)
-{
-     MyPtr<T1> temp = x2;
-     x2 = x1;
-     x1 = temp;
-}
+//           return out;
+//      }
+
+//      bool operator!=(MyPtr<T> &input)
+//      {
+//           bool out = true;
+//           if (*ptr == *input.ptr)
+//           {
+//                out = false;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator<(MyPtr<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr < *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator>(MyPtr<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr > *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator<=(MyPtr<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr <= *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator>=(MyPtr<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr >= *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      T &get() const
+//      {
+
+//           return *ptr;
+//      }
+
+//      const T *getAdress()
+//      {
+//           return ptr;
+//      }
+// };
+
+// template <typename T1>
+// void swap(MyPtr<T1> &x1, MyPtr<T1> &x2)
+// {
+//      MyPtr<T1> temp;
+//      temp = std::move(x1);
+//      x1 = std::move(x2);
+//      x2 = std::move(temp);
+// }
+
+// template <typename T>
+// class MyPtr_ref
+// {
+//      int *ref_num;
+//      T *ptr;
+
+// public:
+//      MyPtr_ref() noexcept
+//      {
+//           ptr = new T;
+//           ref_num = new int;
+//           *ref_num = 0;
+//      };
+
+//      MyPtr_ref(T input)
+//      {
+//           ptr = new T;
+//           *ptr = input;
+//           ref_num = new int;
+//           *ref_num = 1;
+//      };
+
+//      ~MyPtr_ref()
+//      {
+//           if (*ref_num < 1)
+//           {
+//                delete ptr;
+//           }
+//           (*ref_num)--;
+//      }
+
+//      MyPtr_ref(MyPtr_ref &x)
+//      {
+//           ptr = x.ptr;
+//           ref_num = x.ref_num;
+//           (*ref_num)++;
+//      }
+
+//      MyPtr_ref &operator=(MyPtr_ref &x)
+//      {
+//           ptr = x.ptr;
+//           ref_num = x.ref_num;
+//           (*ref_num)++;
+//           return *this;
+//      }
+
+//      // MyPtr_ref &operator=(MyPtr_ref &&x)
+//      // {
+//      //      if (&x != this)
+//      //      {
+//      //           delete ptr;
+//      //           ptr = x.ptr;
+//      //           x.ptr = nullptr;
+//      //      }
+//      //      return *this;
+//      // }
+
+//      void operator=(T input)
+//      {
+//           *ptr = input;
+//      }
+
+//      T operator*()
+//      {
+//           return *ptr;
+//      }
+
+//      bool operator==(MyPtr_ref<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr == *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator!=(MyPtr_ref<T> &input)
+//      {
+//           bool out = true;
+//           if (*ptr == *input.ptr)
+//           {
+//                out = false;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator<(MyPtr_ref<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr < *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator>(MyPtr_ref<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr > *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator<=(MyPtr_ref<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr <= *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      bool operator>=(MyPtr_ref<T> &input)
+//      {
+//           bool out = false;
+//           if (*ptr >= *input.ptr)
+//           {
+//                out = true;
+//           }
+
+//           return out;
+//      }
+
+//      T &get() const
+//      {
+
+//           return *ptr;
+//      }
+
+//      const T *getAdress()
+//      {
+//           return ptr;
+//      }
+
+//      int get_count()
+//      {
+//           int output = *ref_num;
+//           return output;
+//      }
+// };
 
 int main(void)
 {
-     MyPtr<int> p = 5;
-     MyPtr<int> p1(10);
-     MyPtr<int> p2 = MyPtr<int>(15);
-     MyPtr<int> p3(p1);
 
-     std::cout << "ptr val: " << p.get() << " address: " << (p.getAdress()) << std::endl;
-     std::cout << "ptr1 val: " << p1.get() << " address: " << (p1.getAdress()) << std::endl;
-     std::cout << "ptr2 val: " << p2.get() << " address: " << (p2.getAdress()) << std::endl;
-     std::cout << "ptr3 val: " << p3.get() << " address: " << (p3.getAdress()) << std::endl;
+     // std::cout << "Unique Pointers" << std::endl;
+     // MyPtr<int> p{10};
+     // MyPtr<int> p1{10};
 
-     swap(p, p1);
+     // std::cout << "ptr val: " << *p << " address: " << (p.getAdress()) << std::endl;
+     // std::cout << "ptr1 val: " << *p1 << " address: " << (p1.getAdress()) << std::endl;
 
-     std::cout << "ptr val: " << p.get() << " address: " << (p.getAdress()) << std::endl;
-     std::cout << "ptr1 val: " << p1.get() << " address: " << (p1.getAdress()) << std::endl;
+     // std::cout << (p < p1) << std::endl;
+
+     // p = std::move(p1);
+     // p1 = std::move(MyPtr<int>(15));
+
+     // std::cout << "ptr val: " << p.get() << " address: " << (p.getAdress()) << std::endl;
+     // std::cout << "ptr1 val: " << static_cast<bool>(*p1) << " address: " << (p1.getAdress()) << std::endl;
+
+     // try
+     // {
+     //      swap(p, p1);
+     // }
+     // catch (const std::exception &e)
+     // {
+     //      std::cerr << e.what() << '\n';
+     // }
+
+     // std::cout << "ptr val: " << p.get() << " address: " << (p.getAdress()) << std::endl;
+     // std::cout << "ptr1 val: " << p1.get() << " address: " << (p1.getAdress()) << std::endl;
+
+     std::cout << "Shread Pointers" << std::endl;
+
+     MyPtr_ref<int> pr{12};
+     std::cout << "ptr val: " << pr.get() << " address: " << (pr.getAdress()) << " Ref number: " << pr.get_count() << std::endl;
+
+     MyPtr_ref<int> px;
+
+     std::cout << (px > pr) << std::endl;
+
+     std::cout << "ptr val: " << px.get() << " address: " << (px.getAdress()) << " Ref number: " << px.get_count() << std::endl;
+
+     MyPtr_ref<int> pr1(pr);
+
+     std::cout << "ptr val: " << pr.get() << " address: " << (pr.getAdress()) << " Ref number: " << pr.get_count() << std::endl;
+     std::cout << "ptr1 val: " << pr1.get() << " address: " << (pr1.getAdress()) << " Ref number: " << pr1.get_count() << std::endl;
+
+     px = pr;
+
+     std::cout << "ptr val: " << pr.get() << " address: " << (pr.getAdress()) << " Ref number: " << pr.get_count() << std::endl;
+     std::cout << "ptr1 val: " << pr1.get() << " address: " << (pr1.getAdress()) << " Ref number: " << pr1.get_count() << std::endl;
+     std::cout << "ptr val: " << px.get() << " address: " << (px.getAdress()) << " Ref number: " << px.get_count() << std::endl;
+     std::cout << "Destructor!" << std::endl;
+     pr1.~MyPtr_ref();
+
+     std::cout << "ptr val: " << pr.get() << " address: " << (pr.getAdress()) << " Ref number: " << pr.get_count() << std::endl;
+     std::cout << "ptr1 val: " << pr1.get() << " address: " << (pr1.getAdress()) << " Ref number: " << pr1.get_count() << std::endl;
+     std::cout << "ptr val: " << px.get() << " address: " << (px.getAdress()) << " Ref number: " << px.get_count() << std::endl;
 
      return 0;
 }
