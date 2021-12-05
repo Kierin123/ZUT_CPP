@@ -1,7 +1,7 @@
 CFLAGS = -Wall -Wextra -Wpedantic
 CC = g++
-LDFLAGS = -lpthread
-SOURCES = main.cpp 
+LDFLAGS = -lpthread -lgtest
+SOURCES = main.cpp tests.cpp Prime.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = program
 

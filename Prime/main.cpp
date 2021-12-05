@@ -5,6 +5,9 @@
 #include <fstream>
 #include <mutex>
 #include "Prime.h"
+#include "gtest/gtest.h"
+
+
 
 using namespace std::chrono;
 using std::cout;
@@ -60,8 +63,11 @@ void Thread_handler_rabin(std::vector<long long int> _vector)
 //        MAIN
 //################################
 
-int main(void)
+int main(int argc, char *argv[])
 {
+     ::testing::InitGoogleTest(&argc,argv);
+     RUN_ALL_TESTS();
+
      std::vector<long long int> numbers_to_check;
      int number_length = 20;
      char number_output[20];
